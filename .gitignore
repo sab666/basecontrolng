@@ -1,0 +1,11 @@
+Applications/
+!Applications/BaseControlNG.app/*
+Icons/
+Libraries/
+!Libraries/Storage
+Localizations/
+Screensavers/
+Pictures/
+Users/
+OS.lua
+Versions.cfg

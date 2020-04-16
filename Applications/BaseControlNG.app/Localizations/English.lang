@@ -1,0 +1,5 @@
+{
+  moduleNameOverview = "Overview",
+  moduleNameStatus = "Status",
+  moduleNameSettings = "Settings"
+}

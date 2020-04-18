@@ -95,11 +95,10 @@ local function saveConfig()
 end
 
 local function loadConfig()
-  if filesystem.exists(currentScriptDirectory .. "config") then
-    _G.BaseConfig = filesystem.readTable(currentScriptDirectory .. "config")
-  else
-    saveConfig()
+  if not filesystem.exists(currentScriptDirectory .. "config") then
+    os.copyfile(currentScriptDirectory .. "config.dist", currentScriptDirectory .. "config")
   end
+  _G.BaseConfig = filesystem.readTable(currentScriptDirectory .. "config")
 end
 
 window.onResize = function(width, height)
@@ -111,12 +110,6 @@ window.onResize = function(width, height)
 
   window.tabBar:getItem(window.tabBar.selectedItem).onTouch()
 end
-
--- Just to be sure
-if _G.craftTimer then
-  event.removeHandler(_G.craftTimer)
-end
-
 
 function mainLoop()
   for item, stack in pairs(_G.BaseConfig) do
@@ -152,6 +145,11 @@ function mainLoop()
   end
   console.debug('Done with main loop, sleeping for ' .. MAIN_LOOP_DELAY .. ' seconds...')
   os.sleep(MAIN_LOOP_DELAY)
+end
+
+-- Just to be sure
+if _G.craftTimer then
+  event.removeHandler(_G.craftTimer)
 end
 
 _G.craftTimer = event.addHandler(mainLoop, 0, math.huge)

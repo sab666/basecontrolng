@@ -41,7 +41,7 @@ function storage.getItemsInNetwork(filter)
   if type(interface) == 'foo' then
     return interface.getItemsInNetwork(filter)
   else
-    print(type(interface))
+    log.info(type(interface))
     return {}
   end
 end

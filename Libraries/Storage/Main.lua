@@ -38,7 +38,12 @@ end
 
 function storage.getItemsInNetwork(filter)
   local interface = component.get("me_interface")
-  return interface.getItemsInNetwork(filter)
+  if type(interface) == 'foo' then
+    return interface.getItemsInNetwork(filter)
+  else
+    print(type(interface))
+    return {}
+  end
 end
 
 function storage.isBusy()

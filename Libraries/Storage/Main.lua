@@ -24,7 +24,7 @@ function storage.loop()
       _crafting = {}
     end
   end
-  console.debug('Done with main loop, sleeping for ' .. STORAGE_LOOP_DELAY .. ' seconds...')
+  log.debug('Done with main loop, sleeping for ' .. STORAGE_LOOP_DELAY .. ' seconds...')
   os.sleep(STORAGE_LOOP_DELAY)
 end
 

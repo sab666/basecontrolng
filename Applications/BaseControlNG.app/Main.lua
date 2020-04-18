@@ -144,7 +144,7 @@ function mainLoop()
       end
     end
   end
-  console.debug('Done with main loop, sleeping for ' .. MAIN_LOOP_DELAY .. ' seconds...')
+  log.debug('Done with main loop, sleeping for ' .. MAIN_LOOP_DELAY .. ' seconds...')
   os.sleep(MAIN_LOOP_DELAY)
 end
 

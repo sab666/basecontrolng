@@ -5,25 +5,31 @@ local storage = {}
 local _crafting = {}
 local _timer = {}
 
+local STORAGE_LOOP_DELAY = 1;
+
 local function starts_with(str, start)
   return str:sub(1, #start) == start
 end
 
-function storage.init()
-	_timer = event.addHandler(function()
-    for name, item in pairs(_crafting) do
-	    --log.debug("Waiting craft to finish, ".. name)
-      if item.isDone() == true then 
-        log.info(name .. " is done!")
-        _crafting = {}
-      end
-      if item.isCanceled() == true then 
-        local state, err = item.isCanceled()
-        log.warning(name .. " is canceled: " .. err)
-        _crafting = {}
-      end
+function storage.loop()
+  for name, item in pairs(_crafting) do
+    --log.debug("Waiting craft to finish, ".. name)
+    if item.isDone() == true then
+      log.info(name .. " is done!")
+      _crafting = {}
     end
-	end, 1, math.huge)
+    if item.isCanceled() == true then
+      local state, err = item.isCanceled()
+      log.warning(name .. " is canceled: " .. err)
+      _crafting = {}
+    end
+  end
+  console.debug('Done with main loop, sleeping for ' .. STORAGE_LOOP_DELAY .. ' seconds...')
+  os.sleep(STORAGE_LOOP_DELAY)
+end
+
+function storage.init()
+	_timer = event.addHandler(storage.loop, 0, math.huge)
 end
 
 function storage.stop()

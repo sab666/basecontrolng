@@ -13,6 +13,7 @@ package.loading["storage/log"] = nil
 local storage = require("Storage/Main")
 local log = require("Storage/Log")
 
+local MAIN_LOOP_DELAY = 5;
 
 ----------------------------------------------------------------------------------------------------------------
 
@@ -116,7 +117,8 @@ if _G.craftTimer then
   event.removeHandler(_G.craftTimer)
 end
 
-_G.craftTimer = event.addHandler(function()
+
+function mainLoop()
   for item, stack in pairs(_G.BaseConfig) do
     local mod,name,damage = item:match("([^:]+):([^:]+):([^:]+)")
     local full_name = mod .. ":".. name
@@ -148,8 +150,11 @@ _G.craftTimer = event.addHandler(function()
       end
     end
   end
-end, 5, math.huge)
+  console.debug('Done with main loop, sleeping for ' .. MAIN_LOOP_DELAY .. ' seconds...')
+  os.sleep(MAIN_LOOP_DELAY)
+end
 
+_G.craftTimer = event.addHandler(mainLoop, 0, math.huge)
 ----------------------------------------------------------------------------------------------------------------
 
 -- Cancel all events before close

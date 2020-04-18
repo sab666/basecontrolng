@@ -1,17 +1,17 @@
-local image = require("Image")
+--local image = require("Image")
 local screen = require("Screen")
-local GUI = require("GUI") 
+local GUI = require("GUI")
 local filesystem = require("Filesystem")
-local paths = require("Paths")
+--local paths = require("Paths")
 local system = require("System")
 local event = require("Event")
+local storage = require("Storage/Main")
+local log = require("Storage/Log")
 
 package.loaded["storage/main"] = nil -- force unload
 package.loading["storage/main"] = nil
 package.loaded["storage/log"] = nil -- force unload
 package.loading["storage/log"] = nil
-local storage = require("Storage/Main")
-local log = require("Storage/Log")
 
 local MAIN_LOOP_DELAY = 5;
 
@@ -29,7 +29,7 @@ local workspace, window = system.addWindow(GUI.tabbedWindow(1, 1, 100, 40))
 
 window.contentContainer = window:addChild(GUI.container(1, 4, window.width, window.height - 3))
 
-local activityWidget = window:addChild(GUI.object(window.width-4, 1, 4, 3))
+local activityWidget = window:addChild(GUI.object(window.width - 4, 1, 4, 3))
 activityWidget.hidden = true
 activityWidget.position = 0
 activityWidget.color1 = 0x99FF80
@@ -67,7 +67,9 @@ end
 
 local function loadModules()
   local modules = filesystem.list(modulesPath)
-  table.sort(modules, function(a, b) return a < b end)
+  table.sort(modules, function(a, b)
+    return a < b
+  end)
 
   for i = 1, #modules do
     if filesystem.extension(modules[i]) == ".lua" then
@@ -107,27 +109,26 @@ window.onResize = function(width, height)
   window.backgroundPanel.height = height - 3
   window.contentContainer.width = width
   window.contentContainer.height = window.backgroundPanel.height
-
   window.tabBar:getItem(window.tabBar.selectedItem).onTouch()
 end
 
 function mainLoop()
   for item, stack in pairs(_G.BaseConfig) do
-    local mod,name,damage = item:match("([^:]+):([^:]+):([^:]+)")
-    local full_name = mod .. ":".. name
-    local stack_item = {name=full_name, damage=tonumber(damage)}
+    local mod, name, damage = item:match("([^:]+):([^:]+):([^:]+)")
+    local full_name = mod .. ":" .. name
+    local stack_item = { name = full_name, damage = tonumber(damage) }
     local toCraft = tonumber(stack.total)
 
-    local itemStack = storage.getItemsInNetwork(stack_item)[1] 
+    local itemStack = storage.getItemsInNetwork(stack_item)[1]
     if toCraft > itemStack.size then
       if not storage.isCrafting(item) and not storage.isBusy() then
-				if stack.emitRed then
-					component.redstone.setWirelessFrequency(tonumber(stack.emitFreq))
-					if not component.redstone.getWirelessOutput() then
-						log.debug("[%] Emit wireless on signal for " .. itemStack.label .. "(" .. stack.emitFreq .. ")")
-						component.redstone.setWirelessOutput(true)
-					end
-				end
+        if stack.emitRed then
+          component.redstone.setWirelessFrequency(tonumber(stack.emitFreq))
+          if not component.redstone.getWirelessOutput() then
+            log.debug("[%] Emit wireless on signal for " .. itemStack.label .. "(" .. stack.emitFreq .. ")")
+            component.redstone.setWirelessOutput(true)
+          end
+        end
         local amount = toCraft - itemStack.size
         log.info("[+] Crafting " .. itemStack.label .. " (" .. amount .. ")")
         storage.craft(item, amount)
@@ -135,25 +136,17 @@ function mainLoop()
     else
       -- make sure wirestone signal is set
       if stack.emitRed then
-				component.redstone.setWirelessFrequency(tonumber(stack.emitFreqOff))
-				if not component.redstone.getWirelessOutput() then
+        component.redstone.setWirelessFrequency(tonumber(stack.emitFreqOff))
+        if not component.redstone.getWirelessOutput() then
           log.debug("[%] Emit wireless off signal for " .. itemStack.label .. "(" .. stack.emitFreqOff .. ")")
-					component.redstone.setWirelessOutput(true)
-				end
+          component.redstone.setWirelessOutput(true)
+        end
       end
     end
   end
   console.debug('Done with main loop, sleeping for ' .. MAIN_LOOP_DELAY .. ' seconds...')
   os.sleep(MAIN_LOOP_DELAY)
 end
-
--- Just to be sure
-if _G.craftTimer then
-  event.removeHandler(_G.craftTimer)
-end
-
-_G.craftTimer = event.addHandler(mainLoop, 0, math.huge)
-----------------------------------------------------------------------------------------------------------------
 
 -- Cancel all events before close
 window.actionButtons.close.onTouch = function()
@@ -168,8 +161,10 @@ window.actionButtons.close.onTouch = function()
   window:remove()
 end
 
+----------------------------------------------------------------------------------------------------------------
+
 loadConfig()
 storage.init()
 loadModules()
+_G.craftTimer = event.addHandler(mainLoop, 0, math.huge)
 window:resize(window.width, window.height)
---storage.craft("minecraft:glass:0.0", 1)
